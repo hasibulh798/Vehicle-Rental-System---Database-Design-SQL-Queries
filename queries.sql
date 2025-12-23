@@ -1,44 +1,44 @@
 ------------- USERS TABLE ----------------------
-create type
-  user_role as enum('admin', 'customer')
-create table
+CREATE TYPE
+  user_role AS ENUM('admin', 'customer')
+CREATE TABLE IF NOT EXISTS
   users (
-    user_id serial primary key,
-    name varchar(100),
-    email varchar(100) not null unique,
-    password varchar(200) not null,
-    phone varchar(25),
-    role user_role not null default 'customer'
+    user_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(200) NOT NULL,
+    phone VARCHAR(25),
+    role user_role NOT NULL DEFAULT 'customer'
   )
  
   -------------- VEHICLES TABLE --------------
+CREATE TYPE
+  vehicle_type AS ENUM('car', 'bike', 'truck')
 create type
-  vehicle_type as enum('car', 'bike', 'truck')
-create type
-  vehicle_status as enum('available', 'rented', 'maintenance')
-create table
+  vehicle_status AS ENUM('available', 'rented', 'maintenance')
+CREATE TABLE IF NOT EXISTS
   vehicles (
-    vehicle_id serial primary key,
-    name varchar(200) not null,
-    type vehicle_type not null,
-    model varchar(200) not null,
-    registration_number varchar(200) not null unique,
-    rental_price decimal(10, 2) not null,
-    status vehicle_status not null default 'available'
+    vehicle_id SERIAL PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    type vehicle_type NOT NULL,
+    model VARCHAR(200) NOT NULL,
+    registration_number VARCHAR(200) NOT NULL UNIQUE,
+    rental_price DECIMAL(10, 2) NOT NULL,
+    status vehicle_status NOT NULL DEFAULT 'available'
   )
 
 
   ------------ BOOKINGS TABLE -----------------
-create type
-  booking_status as enum('pending', 'confirmed', 'completed', 'cancelled')
-create table
+CREATE TYPE
+  booking_status AS ENUM('pending', 'confirmed', 'completed', 'cancelled')
+CREATE TABLE IF NOT EXISTS
   bookings (
-    booking_id int primary key,
-    user_id int not null references users (user_id) on delete cascade,
-    vehicle_id int not null references vehicles (vehicle_id) on delete cascade,
-    start_date date not null,
-    end_date date not null,
-    status booking_status not null
+    booking_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users (user_id) ON DELETE CASCADE,
+    vehicle_id INT NOT NULL REFERENCES vehicles (vehicle_id) ON DELETE CASCADE,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status booking_status NOT NULL
   )
 
   
@@ -47,58 +47,51 @@ create table
   -- Customer name
   -- Vehicle name
 
-select
+SELECT
   b.booking_id,
-  u.name as "customer_name",
-  v.name as "vehicle_name",
+  u.name AS "customer_name",
+  v.name AS "vehicle_name",
   b.start_date,
   b.end_date,
   b.status
-from
-  bookings as b
-  inner join users as u on b.user_id = u.user_id
-  inner join vehicles as v on b.vehicle_id = v.vehicle_id
+FROM bookings AS b
+INNER JOIN users AS u ON b.user_id = u.user_id
+INNER JOIN vehicles AS v ON b.vehicle_id = v.vehicle_id;
 
 -- Query 2: EXISTS
 -- Find all vehicles that have never been booked.
 
-select
-  *
-from
-  vehicles as v
-where
-  not exists (
-    select
-      1
-    from
-      bookings as b
-    where
-      b.vehicle_id = v.vehicle_id
-  )
 
+SELECT *
+FROM vehicles AS v
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM bookings AS b
+  WHERE b.vehicle_id = v.vehicle_id
+);
 
 -- Query 3: WHERE
 -- Retrieve all available vehicles of a specific type (e.g. cars).
 
-select
+SELECT
   *
-from
-  vehicles as v
-where
+FROM
+  vehicles AS v
+WHERE
   v.status = 'available'
-  and v.type = 'car'
+  AND v.type = 'car'
 
 -- Query 4: GROUP BY and HAVING
 -- Find the total number of bookings for each vehicle and display only those vehicles that have more than 2 bookings.
 
-select
-  v.name as "vehicle_name",
-  count(*) as "total_bookings"
-from
-  bookings as b
-  join vehicles as v
-  on b.vehicle_id = v.vehicle_id
-group by
+SELECT
+  v.name AS "vehicle_name",
+  COUNT(*) AS "total_bookings"
+FROM
+  bookings AS b
+  JOIN vehicles AS v
+  ON b.vehicle_id = v.vehicle_id
+GROUP BY
   v.name
-having
-  count(*) > 2
+HAVING
+  COUNT(*) > 2
