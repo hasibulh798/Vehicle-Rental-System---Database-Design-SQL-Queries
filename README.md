@@ -1,5 +1,42 @@
 # Vehicle Rental System – SQL Queries Documentation
 
+## 🗂 Database Tables Used
+### `users`
+
+Stores customer information.
+
+* `user_id` (PK)
+* `name`
+* `email`
+* `password`
+* `phone`
+* `role` (admin, customer)
+
+### `vehicles`
+
+Stores vehicle inventory.
+
+* `vehicle_id` (PK)
+* `name`
+* `type` (car, bike, truck)
+* `model`
+* `registration_number`
+* `rental_price`
+* `status` (available, rented,maintenance)
+
+### `bookings`
+
+Stores rental booking records.
+
+* `booking_id` (PK)
+* `user_id` (FK → users)
+* `vehicle_id` (FK → vehicles)
+* `start_date`
+* `end_date`
+* `status` (pending, confirmed, completed, cancelled)
+
+---
+
 
 ## 📄 queries.sql – Query Explanations
 
@@ -10,14 +47,14 @@
 ```sql
 SELECT
   b.booking_id,
-  u.name AS customer_name,
-  v.name AS vehicle_name,
+  u.name AS "customer_name",
+  v.name AS "vehicle_name",
   b.start_date,
   b.end_date,
   b.status
-FROM bookings b
-INNER JOIN users u ON b.user_id = u.user_id
-INNER JOIN vehicles v ON b.vehicle_id = v.vehicle_id;
+FROM bookings AS b
+INNER JOIN users AS u ON b.user_id = u.user_id
+INNER JOIN vehicles AS v ON b.vehicle_id = v.vehicle_id;
 ```
 
 #### Explanation:
@@ -35,10 +72,10 @@ INNER JOIN vehicles v ON b.vehicle_id = v.vehicle_id;
 
 ```sql
 SELECT *
-FROM vehicles v
+FROM vehicles AS v
 WHERE NOT EXISTS (
   SELECT 1
-  FROM bookings b
+  FROM bookings AS b
   WHERE b.vehicle_id = v.vehicle_id
 );
 ```
@@ -58,7 +95,7 @@ WHERE NOT EXISTS (
 
 ```sql
 SELECT *
-FROM vehicles v
+FROM vehicles AS v
 WHERE v.status = 'available'
   AND v.type = 'car';
 ```
@@ -77,10 +114,10 @@ WHERE v.status = 'available'
 
 ```sql
 SELECT
-  v.name AS vehicle_name,
-  COUNT(*) AS total_bookings
-FROM bookings b
-JOIN vehicles v ON b.vehicle_id = v.vehicle_id
+  v.name AS "vehicle_name",
+  COUNT(*) AS "total_bookings"
+FROM bookings AS b
+JOIN vehicles AS v ON b.vehicle_id = v.vehicle_id
 GROUP BY v.name
 HAVING COUNT(*) > 2;
 ```
