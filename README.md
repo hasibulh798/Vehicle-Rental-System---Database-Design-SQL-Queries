@@ -1,44 +1,6 @@
 # Vehicle Rental System – SQL Queries Documentation
 
 
-## 🗂 Database Tables Used
-
-### `users`
-
-Stores customer information.
-
-* `user_id` (PK)
-* `name`
-* `email`
-* `password`
-* `phone`
-* `role`
-
-### `vehicles`
-
-Stores vehicle inventory.
-
-* `vehicle_id` (PK)
-* `name`
-* `type` (car, bike, truck)
-* `model`
-* `registration_number`
-* `rental_price`
-* `status` (available, rented, maintenance)
-
-### `bookings`
-
-Stores rental booking records.
-
-* `booking_id` (PK)
-* `user_id` (FK → users)
-* `vehicle_id` (FK → vehicles)
-* `start_date`
-* `end_date`
-* `status`
-
----
-
 ## 📄 queries.sql – Query Explanations
 
 ### 🔹 Query 1: JOIN
@@ -64,11 +26,10 @@ INNER JOIN vehicles v ON b.vehicle_id = v.vehicle_id;
 * Each booking is linked to exactly one user and one vehicle.
 * Only bookings with valid users and vehicles are returned.
 
-📌 **Use case:** Display booking history with full details.
 
 ---
 
-### 🔹 Query 2: EXISTS / NOT EXISTS
+### 🔹 Query 2: NOT EXISTS
 
 **Find all vehicles that have never been booked**
 
@@ -88,7 +49,6 @@ WHERE NOT EXISTS (
 * For each vehicle, the subquery searches for at least one booking.
 * If no booking is found, the vehicle is returned.
 
-📌 **Use case:** Identify unused or idle vehicles.
 
 ---
 
@@ -108,7 +68,6 @@ WHERE v.status = 'available'
 * `WHERE` filters rows before any grouping or joining.
 * Only vehicles that are both **available** and of type **car** are selected.
 
-📌 **Use case:** Show vehicles ready for booking.
 
 ---
 
@@ -132,11 +91,10 @@ HAVING COUNT(*) > 2;
 * `COUNT(*)` calculates total bookings.
 * `HAVING` filters grouped results (unlike `WHERE`).
 
-📌 **Use case:** Identify high-demand vehicles.
 
 ---
 
-## 🧠 Key SQL Concepts Covered
+##  Key SQL Concepts Covered
 
 * INNER JOIN
 * EXISTS / NOT EXISTS
@@ -147,14 +105,5 @@ HAVING COUNT(*) > 2;
 
 ---
 
-## 🎯 Conclusion
-
-These queries demonstrate how core SQL techniques are applied in a production-style backend system. The project is suitable for:
-
-* Backend developer interviews
-* Database design practice
-* Freelance or real-world applications
-
----
-
 ✍️ **Author:** Md. Hasibul Hasan
+
